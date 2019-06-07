@@ -769,7 +769,8 @@ class mzSample
         "sample", 
         "start",
         "end",
-        "index"
+        "index",
+        "scan"
     };
 };
 
