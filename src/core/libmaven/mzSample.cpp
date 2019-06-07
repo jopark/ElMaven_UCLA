@@ -355,7 +355,7 @@ void mzSample::parseMzMLChromatogramList(const xml_node &chromatogramList)
 		string chromatogramId = chromatogram.attribute("id").value();
 		int sampleNo = getSampleNoChromatogram(chromatogramId);
 
-        filterChromatogramId(chromatogramId);
+        cleanFilterLine(chromatogramId);
 
 		vector<float> timeVector;
 		vector<float> intsVector;
@@ -436,14 +436,14 @@ int mzSample::getSampleNoChromatogram(const string &chromatogramId) {
 
 }
 
-void mzSample::filterChromatogramId(string &chromatogramId) {
+void mzSample::cleanFilterLine(string &filterline) {
 
     string filterRegex;
     regex rx;
     for(const string& filterId: filterChromatogram) {
         filterRegex = filterId + "\ *\=\ *[0-9]*\.?[0-9]+";
         rx = filterRegex;
-        chromatogramId = std::regex_replace(chromatogramId, rx, "");
+        filterline = std::regex_replace(filterline, rx, "");
 	}
 }
 
@@ -489,6 +489,11 @@ void mzSample::parseMzMLSpectrumList(const xml_node &spectrumList)
 			string rtStr = scanAttr["scan start time"];
 			rt = string2float(rtStr);
 		}
+
+		if (scanAttr.count("filter string")) {
+			spectrumId = scanAttr["filter string"];
+		}
+		cleanFilterLine(spectrumId);
 
 		map<string, string> isolationWindow = mzML_cvParams(spectrum.first_element_by_path("precursorList/precursor/isolationWindow"));
 		string precursorMzStr = isolationWindow["isolation window target m/z"];
